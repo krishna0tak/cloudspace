@@ -142,6 +142,51 @@ curl -X PATCH http://localhost:4000/api/tasks/<id> \
 
 Tailwind v4+ with PostCSS plugin `@tailwindcss/postcss`. Content scanning defined in `tailwind.config.js`.
 
+## Deploying to Vercel
+
+You can deploy only the frontend plus serverless API (in-memory) using the Vercel CLI. A lightweight serverless version of the API has been added under `client/api/` so the React app and API can live in a single Vercel project.
+
+### 1. Install Vercel CLI
+
+```
+npm i -g vercel
+```
+
+### 2. Deploy (First Time)
+
+From the `client` directory (so Vercel uses that as the project root and picks up the `api/` functions and Vite config):
+
+```
+cd client
+vercel        # answer prompts (scope, create project). Accept defaults; build command: `vite build`, output: `dist`.
+```
+
+### 3. Production Deploy
+
+```
+vercel --prod
+```
+
+### 4. Result
+
+- Frontend served from the built `dist` output
+- API endpoints available at `/api/health`, `/api/tasks`, `/api/tasks/:id` (serverless, non-persistent)
+
+### Notes
+
+- This serverless API is separate from the local Express dev server (`server/`). For persistence or advanced middleware keep the Express app and deploy it to a service that supports long-lived Node processes (Render, Fly.io, Railway) then point the frontend to that API base URL.
+- Memory resets on cold starts; data is ephemeral.
+- For a unified production build with persistence, migrate logic shared between Express and serverless into a common module.
+
+### Local Emulation (optional)
+
+```
+cd client
+vercel dev
+```
+
+This will run Vite and serverless functions together locally (similar to `npm run dev` with the Express server, but using the serverless API implementation).
+
 ## Scripts Summary
 
 | Script | Location | Purpose |
